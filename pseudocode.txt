@@ -1,0 +1,114 @@
+PROGRAM Library App (Proses Peminjaman dan Pengembalian Buku)
+
+    FUNCTION displayMenu():
+            PRINT "Library Management System"
+            PRINT "1. Borrow a Book"
+            PRINT "2. Return a Book"
+            PRINT "3. Exit"
+    END FUNCTION
+
+    FUNCTION displayBooks()
+            FOR "i" from 0 TO LENGTH(books) - 1
+                PRINT "books[i].id", "books[i].title", "books[i].author", "book[i].quantity"
+            END FOR
+
+    FUNCTION displayBorrowedBooks()
+            FOR "i" from 0 TO LENGTH(borrowed_book) - 1
+                IF "borrowed_book[i][1][2]" == books[i].id
+                    PRINT "borrowed_book[i][1][2]", "books[i].title", "books[i].author", "books[i].quantity"
+                END IF
+            END FOR
+
+    FUNCTION isBookAvailable(book_id)
+        READ AND WRITE result WITH BOOLEAN FALSE
+        FOR "i" from 0 TO LENGTH(books) - 1
+            IF "books[i].id" == "book_id"
+                IF "books[i].quantity" >= 1
+                    STORE "result" with TRUE
+                END IF
+                BREAK
+            END IF
+        END FOR
+        return "result"
+    END FUNCTION
+
+    FUNCTION borrowBook(book_id, borrower_id, borrowed_date)
+        FOR "i" from 0 TO LENGTH(books) - 1
+                IF "books[i].id" == "book_id"
+                    STORE "borrowed_book" with [book_id, borrower_id, borrowed_date]
+                    STORE "books[i].quantity" WITH "books[i].quantity - 1"
+                    PRINT "Horee!! Buku " + books[i].title + " karya " + books[i].author + "berhasil dipinjam"
+                    BREAK
+                END IF
+            END FOR
+        END FOR
+    END FUNCTION
+
+    FUNCTION returnBook(book_id, returned_date)
+        FOR "i" from 0 TO LENGTH(borrowed_book) - 1
+            IF "borrowed_book[i].id" == "book_id"
+                STORE "returned_book" WITH ["borrowed_book[i]", returned_book]
+                REMOVE borrowed_book[i]
+                BREAK
+            END IF
+        END FOR
+        FOR "k" from 0 TO LENGTH(books) - 1
+            IF "book.id" == "books[k].id"
+                STORE "books[k].quantity" WITH "books[k].quantity+1"
+                PRINT "Yey!! buku "+ books[k].title + " karya " +books[k].author +"sudah dikembalikan!"
+                BREAK
+            END IF
+        END FOR
+    END FUNCTION
+
+    READ AND WRITE "borrowed_book" with ARRAY
+    READ AND WRITE "Book" with Object
+    READ AND WRITE "returned_book" with ARRAY
+    READ AND WRITE "books" with ARRAY OF OBJECT
+    READ AND WRITE "book_id", "borrower_id" , "quantity" with NUMBER
+    READ AND WRITE "name", "title", "author" with STRING
+    READ AND WRITE "borrowing_date", "returned_date" with DATE
+    
+    books = [
+            Book("ID 1", "Title 1", "Author 1", "Quantity 1"),
+            Book("ID 2", "Title 2", "Author 2", "Quantity 2"),
+            Book("ID 3", "Title 3", "Author 3", "Quantity 3")
+    ]
+
+    Print LoginPage
+    IF have account
+        Call Login()
+    END IF
+    ELSE
+        CALL register()
+        CALL Login()
+    
+    STORE borrower_id WITH user.id
+    WHILE True
+        displayMenu()
+        READ AND WRITE "choice", "book_choice" with NUMBER
+        INPUT choice    
+        IF "choice" == "1"
+            displayBooks()
+            INPUT book_id
+            IF isBookAvailable(book_id)
+                INPUT borrowed_date
+                borrowBook(book_id, borrower_id, borrowed_date)
+            END IF
+            ELSE
+                "Wahh, maaf buku yang Anda pilih belum tersedia!!"
+        ELSE IF "choice" == "2"
+            IF "borrowed_book" != NULL
+                displayBorrowedBooks()
+                INPUT book_id
+                INPUT returned_id
+                returnBook(book_id, returned_id)
+            END IF
+            ELSE
+                PRINT "Hmm, seperti Anda belum meminjam buku"
+        ELSE IF "choice" == "3"
+            BREAK
+        END IF
+        ELSE
+            PRINT "Maaf, inputan yang Anda masukkan tidak sesuai"
+    END WHILE
